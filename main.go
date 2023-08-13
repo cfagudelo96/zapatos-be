@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/cfagudelo96/zapatos-be/app/api/handlers"
 	zapatohdlr "github.com/cfagudelo96/zapatos-be/app/api/handlers/zapato"
 	"github.com/cfagudelo96/zapatos-be/business/zapato"
@@ -19,7 +21,12 @@ func main() {
 
 	addZapatosRoutes(e)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	port := "8080"
+	if p := os.Getenv("PORT"); p != "" {
+		port = p
+	}
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func addZapatosRoutes(e *echo.Echo) {
