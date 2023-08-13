@@ -9,6 +9,6 @@ COPY *.go ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /zapatos
 
-EXPOSE 1323:80
+EXPOSE 80
 
 CMD ["/zapatos"]

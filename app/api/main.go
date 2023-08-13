@@ -19,7 +19,7 @@ func main() {
 
 	addZapatosRoutes(e)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":80"))
 }
 
 func addZapatosRoutes(e *echo.Echo) {
