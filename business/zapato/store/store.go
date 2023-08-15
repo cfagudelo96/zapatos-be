@@ -14,9 +14,82 @@ type InMemoryStore struct {
 }
 
 func NewInMemoryStore() *InMemoryStore {
-	return &InMemoryStore{
+	s := &InMemoryStore{
 		lock: &sync.RWMutex{},
 		db:   make(map[string]*zapato.Zapato),
+	}
+	s.addInitialData()
+	return s
+}
+
+func (s *InMemoryStore) addInitialData() {
+	ctx := context.Background()
+	l := []*zapato.NewZapato{
+		{
+			Nombre:    "NY 90 W",
+			Precio:    399.950,
+			Categoria: zapato.CategoriaFemenino,
+			Tags: []string{
+				zapato.TagCasual, zapato.TagDeportivo,
+			},
+			Imagen: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/1b9dff65bee740de8529aeec0091c760_9366/ny-90-w.jpg",
+		},
+		{
+			Nombre:    "Duramo RC Shoes",
+			Precio:    270.950,
+			Categoria: zapato.CategoriaFemenino,
+			Tags: []string{
+				zapato.TagDeportivo,
+			},
+			Imagen: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/e2b338361b024762a9b5ff8f93689853_9366/duramo-rc-shoes.jpg",
+		},
+		{
+			Nombre:    "Response Runner Shoes",
+			Precio:    229.950,
+			Categoria: zapato.CategoriaFemenino,
+			Tags: []string{
+				zapato.TagDeportivo,
+			},
+			Imagen: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/fbd76634f84e4dfd8154bddbd72ba7c3_9366/response-runner-shoes.jpg",
+		},
+		{
+			Nombre:    "Yzy Knit RNR",
+			Precio:    899.950,
+			Categoria: zapato.CategoriaMasculino,
+			Tags: []string{
+				zapato.TagDeportivo,
+			},
+			Imagen: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/39c8469426b04c17bd4da7f42e89a6c8_9366/yzy-knit-rnr.jpg",
+		},
+		{
+			Nombre:    "Tenis Samba OG",
+			Precio:    599.950,
+			Categoria: zapato.CategoriaMasculino,
+			Tags: []string{
+				zapato.TagFormal,
+			},
+			Imagen: "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/5c7f0a2ca4c5450fbea8afb200f9f923_9366/tenis-samba-og.jpg",
+		},
+		{
+			Nombre:    "Tenis Questar Flow NXT",
+			Precio:    159.271,
+			Categoria: zapato.CategoriaInfantil,
+			Tags:      []string{zapato.TagCasual, zapato.TagFormal},
+			Imagen:    "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/91ef876b56de40d281d4ac3700aacd0b_9366/tenis-questar-flow-nxt.jpg",
+		},
+		{
+			Nombre:    "Tenis Monofit Slip-On",
+			Precio:    219.50,
+			Categoria: zapato.CategoriaInfantil,
+			Tags:      []string{zapato.TagCasual, zapato.TagDeportivo},
+			Imagen:    "https://assets.adidas.com/images/w_766,h_766,f_auto,q_auto,fl_lossy,c_fill,g_auto/ee931bc180644ea6bdc0ece249b48176_9366/tenis-monofit-slip-on.jpg",
+		},
+	}
+	for _, nz := range l {
+		z := nz.ToZapato()
+		if err := s.Create(ctx, z); err != nil {
+			panic(err)
+		}
 	}
 }
 
