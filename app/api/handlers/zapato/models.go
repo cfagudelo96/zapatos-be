@@ -20,6 +20,20 @@ func (r *CreateRequest) ToNewZapato() *zapato.NewZapato {
 	}
 }
 
+type AddCommentRequest struct {
+	Calificacion uint8  `json:"calificacion" validate:"gte=0,lte=5"`
+	Autor        string `json:"autor" validate:"required,email"`
+	Comentario   string `json:"comentario" validate:"required"`
+}
+
+func (r AddCommentRequest) ToNewComentario() *zapato.NewComentario {
+	return &zapato.NewComentario{
+		Calificacion: r.Calificacion,
+		Autor:        r.Autor,
+		Comentario:   r.Comentario,
+	}
+}
+
 type Filtro struct {
 	AtributoOrden string   `query:"atributo" validate:"omitempty,oneof=precio calificacion"`
 	Orden         string   `query:"orden" validate:"omitempty,oneof=asc desc"`

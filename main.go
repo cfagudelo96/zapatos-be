@@ -38,4 +38,5 @@ func addZapatosRoutes(e *echo.Echo) {
 	e.GET("/zapatos", zhandler.List)
 	e.GET("/zapatos/:id", zhandler.Get)
 	e.DELETE("/zapatos/:id", zhandler.Delete)
+	e.POST("/zapatos/:id/comment", zhandler.AddComment)
 }

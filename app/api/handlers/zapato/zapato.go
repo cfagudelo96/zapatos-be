@@ -34,6 +34,26 @@ func (h *Handler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, z)
 }
 
+func (h *Handler) AddComment(c echo.Context) error {
+	ctx := c.Request().Context()
+	id := c.Param("id")
+	var r AddCommentRequest
+	if err := c.Bind(&r); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&r); err != nil {
+		return err
+	}
+	z, err := h.service.AddComment(ctx, id, r.ToNewComentario())
+	if err != nil {
+		if errors.Is(err, zapato.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("El zapato con el ID %q no fue encontrado", id))
+		}
+		return err
+	}
+	return c.JSON(http.StatusOK, z)
+}
+
 func (h *Handler) Get(c echo.Context) error {
 	ctx := c.Request().Context()
 	id := c.Param("id")

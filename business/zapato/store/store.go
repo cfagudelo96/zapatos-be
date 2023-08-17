@@ -105,6 +105,22 @@ func (s *InMemoryStore) Create(ctx context.Context, z *zapato.Zapato) error {
 	return nil
 }
 
+func (s *InMemoryStore) AddComment(ctx context.Context, c *zapato.Comentario) (*zapato.Zapato, error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	z, ok := s.db[c.ZapatoID]
+	if !ok {
+		return nil, zapato.ErrNotFound
+	}
+
+	z.Calificacion = (float64(len(z.Comentarios))*z.Calificacion + float64(c.Calificacion)) / float64(len(z.Comentarios)+1)
+	z.Comentarios = append(z.Comentarios, c)
+	s.db[z.ID] = z
+
+	return z, nil
+}
+
 func (s *InMemoryStore) Get(ctx context.Context, id string) (*zapato.Zapato, error) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()

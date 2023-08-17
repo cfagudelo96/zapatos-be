@@ -19,14 +19,14 @@ const (
 )
 
 type Zapato struct {
-	ID           string       `json:"id,omitempty"`
-	Nombre       string       `json:"nombre,omitempty"`
-	Precio       float64      `json:"precio,omitempty"`
-	Categoria    string       `json:"categoria,omitempty"`
-	Tags         []string     `json:"tags,omitempty"`
-	Imagen       string       `json:"imagen,omitempty"`
-	Calificacion float64      `json:"calificacion,omitempty"`
-	Comentarios  []Comentario `json:"comentarios,omitempty"`
+	ID           string        `json:"id,omitempty"`
+	Nombre       string        `json:"nombre,omitempty"`
+	Precio       float64       `json:"precio,omitempty"`
+	Categoria    string        `json:"categoria,omitempty"`
+	Tags         []string      `json:"tags,omitempty"`
+	Imagen       string        `json:"imagen,omitempty"`
+	Calificacion float64       `json:"calificacion,omitempty"`
+	Comentarios  []*Comentario `json:"comentarios,omitempty"`
 }
 
 type NewZapato struct {
@@ -57,6 +57,22 @@ type ListaZapatos struct {
 
 type Metadata struct {
 	Filtro Filtro `json:"filtro"`
+}
+
+type NewComentario struct {
+	Calificacion uint8  `json:"calificacion,omitempty"`
+	Autor        string `json:"autor,omitempty"`
+	Comentario   string `json:"comentario,omitempty"`
+}
+
+func (n NewComentario) ToComentario(zID string) *Comentario {
+	return &Comentario{
+		ID:           uuid.NewString(),
+		ZapatoID:     zID,
+		Calificacion: n.Calificacion,
+		Autor:        n.Autor,
+		Comentario:   n.Comentario,
+	}
 }
 
 type Comentario struct {

@@ -14,6 +14,7 @@ var (
 type Store interface {
 	Create(ctx context.Context, z *Zapato) error
 	Get(ctx context.Context, id string) (*Zapato, error)
+	AddComment(ctx context.Context, c *Comentario) (*Zapato, error)
 	List(ctx context.Context, filtro Filtro) ([]*Zapato, error)
 	Delete(ctx context.Context, id string) error
 }
@@ -38,6 +39,15 @@ func (s *Service) Get(ctx context.Context, id string) (*Zapato, error) {
 	z, err := s.store.Get(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("getting zapato from store: %w", err)
+	}
+	return z, nil
+}
+
+func (s *Service) AddComment(ctx context.Context, zid string, nc *NewComentario) (*Zapato, error) {
+	c := nc.ToComentario(zid)
+	z, err := s.store.AddComment(ctx, c)
+	if err != nil {
+		return nil, fmt.Errorf("adding comment to zapato: %w", err)
 	}
 	return z, nil
 }
