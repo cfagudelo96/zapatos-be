@@ -117,6 +117,18 @@ func (s *InMemoryStore) Get(ctx context.Context, id string) (*zapato.Zapato, err
 	return z, nil
 }
 
+func (s *InMemoryStore) Delete(ctx context.Context, id string) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if _, ok := s.db[id]; !ok {
+		return zapato.ErrNotFound
+	}
+
+	delete(s.db, id)
+	return nil
+}
+
 func (s *InMemoryStore) List(ctx context.Context, filtro zapato.Filtro) ([]*zapato.Zapato, error) {
 	s.lock.RLock()
 	defer s.lock.RUnlock()

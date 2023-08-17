@@ -3,8 +3,9 @@ package zapato
 import (
 	"errors"
 	"fmt"
-	"github.com/cfagudelo96/zapatos-be/business/zapato"
 	"net/http"
+
+	"github.com/cfagudelo96/zapatos-be/business/zapato"
 
 	"github.com/labstack/echo"
 )
@@ -67,5 +68,13 @@ func (h *Handler) Update(c echo.Context) error {
 }
 
 func (h *Handler) Delete(c echo.Context) error {
-	return nil
+	ctx := c.Request().Context()
+	id := c.Param("id")
+	if err := h.service.Delete(ctx, id); err != nil {
+		if errors.Is(err, zapato.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("El zapato con el ID %q no fue encontrado", id))
+		}
+		return err
+	}
+	return c.NoContent(http.StatusNoContent)
 }

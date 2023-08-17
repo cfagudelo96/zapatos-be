@@ -15,6 +15,7 @@ type Store interface {
 	Create(ctx context.Context, z *Zapato) error
 	Get(ctx context.Context, id string) (*Zapato, error)
 	List(ctx context.Context, filtro Filtro) ([]*Zapato, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type Service struct {
@@ -53,4 +54,11 @@ func (s *Service) List(ctx context.Context, f Filtro) (*ListaZapatos, error) {
 			Filtro: f,
 		},
 	}, nil
+}
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	if err := s.store.Delete(ctx, id); err != nil {
+		return fmt.Errorf("deleting zapato from store: %w", err)
+	}
+	return nil
 }
