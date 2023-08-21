@@ -4,39 +4,73 @@ import (
 	"os"
 
 	"github.com/cfagudelo96/zapatos-be/app/api/handlers"
+	userhdlr "github.com/cfagudelo96/zapatos-be/app/api/handlers/user"
 	zapatohdlr "github.com/cfagudelo96/zapatos-be/app/api/handlers/zapato"
+	"github.com/cfagudelo96/zapatos-be/business/user"
+	userstore "github.com/cfagudelo96/zapatos-be/business/user/store"
 	"github.com/cfagudelo96/zapatos-be/business/zapato"
-	"github.com/cfagudelo96/zapatos-be/business/zapato/store"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	zapatostore "github.com/cfagudelo96/zapatos-be/business/zapato/store"
+	echojwt "github.com/labstack/echo-jwt/v4"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-func main() {
+type server struct {
+	e             *echo.Echo
+	jwtSecret     string
+	jwtMiddleware echo.MiddlewareFunc
+}
+
+func newServer() *server {
 	e := echo.New()
 	e.Validator = handlers.NewValidator()
+
+	secret := os.Getenv("ZAPATOS_SECRET")
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	addZapatosRoutes(e)
+	s := &server{
+		e:             e,
+		jwtSecret:     secret,
+		jwtMiddleware: echojwt.JWT([]byte(secret)),
+	}
+	s.addUserRoutes()
+	s.addZapatosRoutes()
+
+	return s
+}
+
+func main() {
+	s := newServer()
 
 	port := "8080"
 	if p := os.Getenv("PORT"); p != "" {
 		port = p
 	}
 
-	e.Logger.Fatal(e.Start(":" + port))
+	s.e.Logger.Fatal(s.e.Start(":" + port))
 }
 
-func addZapatosRoutes(e *echo.Echo) {
-	zstore := store.NewInMemoryStore()
+func (s *server) addUserRoutes() {
+	ustore := userstore.NewInMemoryStore()
+	uservice := user.NewService(ustore)
+	uhandler := userhdlr.NewHandler(uservice, s.jwtSecret)
+
+	s.e.POST("sign-in", uhandler.SignIn)
+	s.e.POST("sign-up", uhandler.SignUp)
+}
+
+func (s *server) addZapatosRoutes() {
+	zstore := zapatostore.NewInMemoryStore()
 	zservice := zapato.NewService(zstore)
 	zhandler := zapatohdlr.NewHandler(zservice)
 
-	e.POST("/zapatos", zhandler.Create)
-	e.GET("/zapatos", zhandler.List)
-	e.GET("/zapatos/:id", zhandler.Get)
-	e.DELETE("/zapatos/:id", zhandler.Delete)
-	e.POST("/zapatos/:id/comment", zhandler.AddComment)
+	g := s.e.Group("/zapatos")
+	g.GET("", zhandler.List)
+	g.GET("/:id", zhandler.Get)
+	g.POST("", zhandler.Create, s.jwtMiddleware)
+	g.DELETE("/:id", zhandler.Delete, s.jwtMiddleware)
+	g.POST("/:id/comment", zhandler.AddComment, s.jwtMiddleware)
 }

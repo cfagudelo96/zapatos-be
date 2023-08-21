@@ -7,7 +7,7 @@ import (
 
 	"github.com/cfagudelo96/zapatos-be/business/zapato"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
