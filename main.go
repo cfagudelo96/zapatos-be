@@ -15,6 +15,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+const secret = "93A4BA417F16957C8191C32B593E6" // This should be stored in an env variable.
+
 type server struct {
 	e             *echo.Echo
 	jwtSecret     string
@@ -24,8 +26,6 @@ type server struct {
 func newServer() *server {
 	e := echo.New()
 	e.Validator = handlers.NewValidator()
-
-	secret := os.Getenv("ZAPATOS_SECRET")
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
